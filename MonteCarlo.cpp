@@ -1,4 +1,4 @@
-#include "MonteCarlo.h"
+#include "MonteCarlo.hpp"
 #include <iostream>
 #include <random>
 #include <cmath>
@@ -8,8 +8,11 @@ MonteCarlo::MonteCarlo(IsingModel& model_, int cycles_)
     int L = model_.getLatticeSize();
     N = L * L;
 
-    // Initialize accumulators
     E_sum = E2_sum = Mabs_sum = M2_sum = 0.0;
+
+    // Prepare storage for Problem 5
+    E_inst.resize(cycles); //the storage for the E_inst in that moment/lattice
+    E_mean.resize(cycles); //storage for the mean of the lattices we have explored
 }
 
 // -----------------------------------------------------------------------------
@@ -24,6 +27,9 @@ void MonteCarlo::run() {
     std::uniform_int_distribution<int> randSite(0, L - 1);
     std::uniform_real_distribution<double> uniform(0.0, 1.0);
 
+
+
+    double cumulative_E = 0.0; // we initialize the cumulative E to be 0 in the start
     // Perform Monte Carlo cycles
     for (int cycle = 0; cycle < cycles; ++cycle) {
         // Try flipping N random spins per cycle (one sweep)
@@ -43,6 +49,11 @@ void MonteCarlo::run() {
                     model.flipSpin(i, j, dE);
                 }
             }
+            double E = model.getE(); //extracting the E
+            cumulative_E += E; 
+            E_inst[cycle] = E/N; 
+            E_mean[cycle] = (cumulative_E / (cycle + 1)) / N; //have to divide cumulative with cycle +1 to avoid division by 0.
+
         }
 
         // Measure observables after each full sweep

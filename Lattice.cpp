@@ -1,4 +1,4 @@
-#include "Lattice.h"
+#include "Lattice.hpp"
 
 Lattice::Lattice(int L_) : L(L_), spins(L_, std::vector<int>(L_, 1)) {
     std::random_device rd;

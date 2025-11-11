@@ -1,4 +1,4 @@
-#include "IsingModel.h"
+#include "IsingModel.hpp"
 #include <iostream>
 #include <cmath>
 
