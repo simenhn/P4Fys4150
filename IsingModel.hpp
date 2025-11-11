@@ -1,7 +1,8 @@
 #pragma once
-#include "Lattice.h"
+#include "Lattice.hpp"
 #include <map>
 #include <cmath>
+
 
 class IsingModel {
 private:
