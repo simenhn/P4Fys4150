@@ -49,13 +49,12 @@ void MonteCarlo::run() {
                     model.flipSpin(i, j, dE);
                 }
             }
-            double E = model.getE(); //extracting the E
-            cumulative_E += E; 
-            E_inst[cycle] = E/N; 
-            E_mean[cycle] = (cumulative_E / (cycle + 1)) / N; //have to divide cumulative with cycle +1 to avoid division by 0.
 
         }
-
+        double E = model.getE(); //extracting the E
+        cumulative_E += E/N; 
+        E_inst[cycle] = E/N; 
+        E_mean[cycle] = (cumulative_E / (cycle + 1)) ; //have to divide cumulative with cycle +1 to avoid division by 0.
         // Measure observables after each full sweep
         measure();
     }
