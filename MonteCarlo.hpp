@@ -23,4 +23,7 @@ public:
     const std::vector<double>& getEInst() const { return E_inst; }
     const std::vector<double>& getEMean() const { return E_mean; }
     int getCycles() const { return cycles; }
+
+    //We also add in a EnergyHistogram that will sort the energy sampler AFTER burn-in
+    void energy_histogram(int burnin_cycles , int n_samples , int bins);
 };

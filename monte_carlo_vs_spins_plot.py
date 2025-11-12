@@ -32,7 +32,7 @@ plt.title("Instantaneous energy per spin vs Monte Carlo cycles")
 plt.grid(True, ls="--", alpha=0.4)
 plt.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig("figs/burnin_cycle_e-inst.pdf")
 
 
 plt.figure(figsize=(9,6))
@@ -46,6 +46,6 @@ plt.title("Running mean energy per spin vs Monte Carlo cycles")
 plt.grid(True, ls="--", alpha=0.4)
 plt.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig("figs/burnin_cycle_e-mean.pdf")
 
 
