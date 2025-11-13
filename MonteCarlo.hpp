@@ -25,5 +25,6 @@ public:
     int getCycles() const { return cycles; }
 
     //We also add in a EnergyHistogram that will sort the energy sampler AFTER burn-in
-    void energy_histogram(int burnin_cycles , int n_samples , int bins);
+    std::pair<std::vector<double>, std::vector<double>> //structuring the return of the energy_histogram
+    energy_histogram(int burnin_cycles , int n_samples , int bins );
 };

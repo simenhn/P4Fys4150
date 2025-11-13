@@ -15,9 +15,8 @@ MonteCarlo::MonteCarlo(IsingModel& model_, int cycles_)
     E_mean.resize(cycles); //storage for the mean of the lattices we have explored
 }
 
-// -----------------------------------------------------------------------------
+
 //  Main Monte Carlo loop 
-// -----------------------------------------------------------------------------
 void MonteCarlo::run() {
     int L = model.getLatticeSize();
     double beta = model.getBeta();
@@ -60,9 +59,8 @@ void MonteCarlo::run() {
     }
 }
 
-// -----------------------------------------------------------------------------
+
 //  Measure energy and magnetization (accumulate sums for averages)
-// -----------------------------------------------------------------------------
 void MonteCarlo::measure() {
     double E = model.getE();
     double M = model.getM();
@@ -73,9 +71,7 @@ void MonteCarlo::measure() {
     M2_sum  += M * M;
 }
 
-// -----------------------------------------------------------------------------
 //  Compute and print final averages
-// -----------------------------------------------------------------------------
 void MonteCarlo::results() const {
     double beta = model.getBeta();
     double norm = 1.0 / static_cast<double>(cycles);
@@ -100,31 +96,31 @@ void MonteCarlo::results() const {
 
 
 // Computes a histogram of the energy per spin after burn-in cycles
-void MonteCarlo::energy_histogram(int burnin_cycles, int n_samples, int bins) {
-    std::vector<int> hist(bins, 0); // Histogram bins
-    double eps_min = -2.0;          // Minimum possible energy per spin for 2D Ising
-    double eps_max = 2.0;           // Maximum possible energy per spin
-    double bin_width = (eps_max - eps_min) / bins; // Width of each bin
+std::pair<std::vector<double>, std::vector<double>>
+MonteCarlo::energy_histogram(int burnin_cycles, int n_samples, int bins) {
 
-    // Random number generators
-    int L = model.getLatticeSize(); // Lattice size for random site selection
+    std::vector<int> hist(bins, 0);
+    double eps_min = -2.0;
+    double eps_max = 2.0;
+    double bin_width = (eps_max - eps_min) / bins;
+
+    int L = model.getLatticeSize();
     std::mt19937_64 gen(std::random_device{}());
     std::uniform_int_distribution<int> randSite(0, L - 1);
     std::uniform_real_distribution<double> uniform(0.0, 1.0);
 
-    // Burn-in phase: thermalize the system
+    // Here is the burnin cycles that we loop through
     for (int b = 0; b < burnin_cycles; ++b) {
         for (int l = 0; l < N; ++l) {
-            int i = randSite(gen); // Random row
-            int j = randSite(gen); // Random column
-            double dE = model.deltaE(i, j); // Energy change if spin is flipped
-            // Metropolis criterion: accept flip if dE <= 0 or with Boltzmann probability
+            int i = randSite(gen);
+            int j = randSite(gen);
+            double dE = model.deltaE(i, j);
             if (dE <= 0.0 || uniform(gen) < model.getBoltzmann(dE))
                 model.flipSpin(i, j, dE);
         }
     }
 
-    // Sampling phase: collect energy samples for histogram
+    // Sampling after the burnin is complete
     for (int s = 0; s < n_samples; ++s) {
         for (int l = 0; l < N; ++l) {
             int i = randSite(gen);
@@ -134,10 +130,23 @@ void MonteCarlo::energy_histogram(int burnin_cycles, int n_samples, int bins) {
                 model.flipSpin(i, j, dE);
         }
 
-        double eps = model.getE() / static_cast<double>(N); // Energy per spin
-        int bin_index = static_cast<int>((eps - eps_min) / bin_width); // Find bin
+        double eps = model.getE() / static_cast<double>(N);
+        int bin_index = static_cast<int>((eps - eps_min) / bin_width);
         if (bin_index >= 0 && bin_index < bins)
-            hist[bin_index]++; // Increment bin count
+            hist[bin_index]++;
     }
 
+    // Normalizing the results and returning the centers , propabilities.
+    double total = 0.0;
+    for (int c : hist) total += c;
+
+    std::vector<double> probs(bins);
+    std::vector<double> centers(bins);
+
+    for (int i = 0; i < bins; ++i) {
+        centers[i] = eps_min + (i + 0.5) * bin_width;
+        probs[i] = hist[i] / total;
+    }
+
+    return {centers, probs};
 }
