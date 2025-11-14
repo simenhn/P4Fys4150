@@ -40,3 +40,6 @@ for label, g in df.groupby("label"):
     plt.tight_layout()
     plt.savefig(f"figs/histogram_for_{label}.pdf")
     plt.show()
+
+
+
