@@ -39,3 +39,7 @@
 
 # debug information files
 *.dwo
+
+ising_sim
+ising_burnin
+propability_sim
