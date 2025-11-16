@@ -43,3 +43,6 @@
 ising_sim
 ising_burnin
 propability_sim
+ising_parallel
+
+.vscode

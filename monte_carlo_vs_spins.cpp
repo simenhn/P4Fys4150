@@ -34,11 +34,11 @@ int main(){
     mc1.run();
     const auto& E_inst1 = mc1.getEInst();   // Instantaneous energies
     const auto& E_mean1 = mc1.getEMean();   // Mean energies
-    std::ofstream f1("data_output/energy_T1_random.txt");
+    std::ofstream f1("data_output/energy_T1_random.txt"); // We efine the output where we want to write to
     for (int i = 0; i < 50000; ++i){
-        f1 << i << " " << E_inst1[i] << " " << E_mean1[i] << "\n";
+        f1 << i << " " << E_inst1[i] << " " << E_mean1[i] << "\n"; // Define the dataset
     }
-    f1.close();
+    f1.close(); //close the file so that we can open a new one and write to it.
 
     // Run simulation for T=1.0, ordered initial state
     std::cout << "Running T=1.0 not-random..." << std::endl;

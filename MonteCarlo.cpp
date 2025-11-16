@@ -99,53 +99,55 @@ void MonteCarlo::results() const {
 std::pair<std::vector<double>, std::vector<double>>
 MonteCarlo::energy_histogram(int burnin_cycles, int n_samples, int bins) {
 
-    std::vector<int> hist(bins, 0);
-    double eps_min = -2.0;
+    std::vector<int> hist(bins, 0); // We create the container for the bins
+    double eps_min = -2.0; //we define the minimum and maximum value
     double eps_max = 2.0;
-    double bin_width = (eps_max - eps_min) / bins;
+    double bin_width = (eps_max - eps_min) / bins; //the width is dependant upon the number of bins and the range
 
+    
+    // Here we have the random number generator
     int L = model.getLatticeSize();
     std::mt19937_64 gen(std::random_device{}());
     std::uniform_int_distribution<int> randSite(0, L - 1);
     std::uniform_real_distribution<double> uniform(0.0, 1.0);
 
     // Here is the burnin cycles that we loop through
-    for (int b = 0; b < burnin_cycles; ++b) {
+    for (int b = 0; b < burnin_cycles; ++b) { // we loop through the burnin cycles that we want to discard
         for (int l = 0; l < N; ++l) {
-            int i = randSite(gen);
+            int i = randSite(gen); // we randomly pick out the lattice which position is given as [i , j]
             int j = randSite(gen);
             double dE = model.deltaE(i, j);
             if (dE <= 0.0 || uniform(gen) < model.getBoltzmann(dE))
-                model.flipSpin(i, j, dE);
+                model.flipSpin(i, j, dE); // if the difference is less than 0 we accept, if not we flip the spin.
         }
     }
 
     // Sampling after the burnin is complete
     for (int s = 0; s < n_samples; ++s) {
         for (int l = 0; l < N; ++l) {
-            int i = randSite(gen);
+            int i = randSite(gen); //again get the random lattice position as [i , j]
             int j = randSite(gen);
             double dE = model.deltaE(i, j);
             if (dE <= 0.0 || uniform(gen) < model.getBoltzmann(dE))
-                model.flipSpin(i, j, dE);
+                model.flipSpin(i, j, dE); //again we sample the boltzman distribution and accept if the difference is < 0, and spin if not.
         }
 
-        double eps = model.getE() / static_cast<double>(N);
-        int bin_index = static_cast<int>((eps - eps_min) / bin_width);
-        if (bin_index >= 0 && bin_index < bins)
-            hist[bin_index]++;
+        double eps = model.getE() / static_cast<double>(N); // Here we get the energy per spin
+        int bin_index = static_cast<int>((eps - eps_min) / bin_width); //we sort this into a bin index,
+        if (bin_index >= 0 && bin_index < bins) // this is so we don't go out of bounds
+            hist[bin_index]++; //we append to the histogram the bin_index
     }
 
     // Normalizing the results and returning the centers , propabilities.
     double total = 0.0;
-    for (int c : hist) total += c;
+    for (int c : hist) total += c; 
 
     std::vector<double> probs(bins);
     std::vector<double> centers(bins);
 
     for (int i = 0; i < bins; ++i) {
-        centers[i] = eps_min + (i + 0.5) * bin_width;
-        probs[i] = hist[i] / total;
+        centers[i] = eps_min + (i + 0.5) * bin_width; // here we get the venters for the bins by going manually from the minimum
+        probs[i] = hist[i] / total; //and then we extract the propabilities of the bins by dividing the bins by the total propability.
     }
 
     return {centers, probs};
