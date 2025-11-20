@@ -6,7 +6,7 @@ LATTICE_SIZE      = 8
 GRID_LINE_WIDTH   = 1.2
 ARROW_HEAD_WIDTH  = 0.2
 ARROW_HEAD_LENGTH = 0.15
-MARGIN            = 0.5
+MARGIN            = 0.4
 
 FIG_DIR = Path(__file__).parent.parent.absolute() / "figs"
 
@@ -21,7 +21,7 @@ def plot_arrow_lattice(lat, shear_factor=0.3):
         lat: 2D array of spin values (+1 or -1)
         shear_factor: Amount of shear to apply (default 0.3)
     """
-    fig, ax = plt.subplots(figsize=(8, 8))
+    fig, ax = plt.subplots(figsize=(8, 6))
     
     L = lat.shape[0]
     
@@ -81,3 +81,4 @@ if __name__ == "__main__":
     plot_arrow_lattice(lat)
     plt.tight_layout(pad=0.1)
     plt.savefig(FIG_DIR / "lattice_arrow_plot.pdf")
+    #plt.show()
