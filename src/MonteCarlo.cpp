@@ -7,7 +7,7 @@ MonteCarlo::MonteCarlo(IsingModel& model_, int cycles_)
     : model(model_), cycles(cycles_) {
     int L = model_.getLatticeSize();
     N = L * L;
-
+    beta = model.getBeta();
     E_sum = E2_sum = Mabs_sum = M2_sum = 0.0;
 
     // Prepare storage for Problem 5
@@ -71,26 +71,16 @@ void MonteCarlo::measure() {
     M2_sum  += M * M;
 }
 
-//  Compute and print final averages
 void MonteCarlo::results() const {
-    double beta = model.getBeta();
-    double norm = 1.0 / static_cast<double>(cycles);
-    double N_inv = 1.0 / static_cast<double>(N);
-
-    double E_avg   = E_sum * norm;
-    double E2_avg  = E2_sum * norm;
-    double Mabs_avg= Mabs_sum * norm;
-    double M2_avg  = M2_sum * norm;
-
-    double Cv = (E2_avg - E_avg * E_avg) * beta * beta * N_inv;
-    double Chi = (M2_avg - Mabs_avg * Mabs_avg) * beta * N_inv;
-
     std::cout << "\n--- Monte Carlo Results ---\n";
+
     std::cout << "Temperature:  " << 1.0 / beta << "\n";
-    std::cout << "<E>/N:        " << (E_avg * N_inv) << "\n";
-    std::cout << "<|M|>/N:      " << (Mabs_avg * N_inv) << "\n";
-    std::cout << "Cv/N:         " << Cv << "\n";
-    std::cout << "Chi/N:        " << Chi << "\n";
+
+    std::cout << "<E>/N:        " << get_epsilon() << "\n";
+    std::cout << "<|M|>/N:      " << get_abs_magnetization() << "\n";
+    std::cout << "Cv/N:         " << get_Cv() << "\n";
+    std::cout << "Chi/N:        " << get_susceptibility() << "\n";
+
     std::cout << "----------------------------\n";
 }
 
@@ -151,4 +141,24 @@ MonteCarlo::energy_histogram(int burnin_cycles, int n_samples, int bins) {
     }
 
     return {centers, probs};
+}
+
+double MonteCarlo::get_epsilon() const {
+    return E_sum / (cycles * N);
+}
+
+double MonteCarlo::get_abs_magnetization() const {
+    return Mabs_sum / (cycles * N);
+}
+
+double MonteCarlo::get_Cv() const {
+    double E_mean = E_sum / cycles;
+    double E2_mean = E2_sum / cycles;
+    return beta * beta * (E2_mean - E_mean * E_mean) / N;
+}
+
+double MonteCarlo::get_susceptibility() const {
+    double Mabs_mean = Mabs_sum / cycles;
+    double M2_mean = M2_sum / cycles;
+    return beta * (M2_mean - Mabs_mean * Mabs_mean) / N;
 }
