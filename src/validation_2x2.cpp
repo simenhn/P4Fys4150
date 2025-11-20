@@ -4,7 +4,7 @@
 #include <iomanip>
 
 int main() {
-    //this is used to run the 
+    //this is used to run the MonteCarlo simulation for a 2x2 lattice to validate against analytical results.
     int L = 2;          // lattice size (use 2x2 for validation)
     double J = 1.0;     // coupling constant
     double T = 1.0;     // temperature in units of J/k_B
