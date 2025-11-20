@@ -1,38 +1,61 @@
 #pragma once
 #include "IsingModel.hpp"
 
+// Struct to hold energy histogram results
+struct EnergyHistogramResult {
+    std::vector<double> bin_centers;
+    std::vector<double> probabilities;
+};
+
 class MonteCarlo {
 private:
-    IsingModel& model;
-    int N, cycles;
-    double E_sum, E2_sum, Mabs_sum, M2_sum;
-    double beta;
-    
+    IsingModel& model_; // Reference to the Ising model
+    int cycles_;        // Number of Monte Carlo cycles
+    double E_sum;      // cumulative sum of energy
+    double E2_sum;     // cumulative sum of energy squared
+    double Mabs_sum;   // cumulative sum of absolute magnetization
+    double M2_sum;     // cumulative sum of magnetization squared
+
     std::vector<double> E_inst; // stores instantaneous energy per spin each cycle
     std::vector<double> E_mean; // stores mean of energy per spin each cycle
 
 public:
+    // Constructor
     MonteCarlo(IsingModel& model, int cycles);
+
+    // Main Monte Carlo loop
     void run();
+
+    // Measure observables
     void measure();
+
+    // Display results
     void results() const;
 
-     /*
-     Since the E_inst and E_mean are private members of the class, we need to have
-     getter functions to be able to ascess them later.
-     */
-    const std::vector<double>& getEInst() const { return E_inst; }
-    const std::vector<double>& getEMean() const { return E_mean; }
-    int getCycles() const { return cycles; }
+    // We also add in a EnergyHistogram that will sort the energy sampler AFTER burn-in
+    EnergyHistogramResult energyHistogram(int burnin_cycles, int n_samples, int bins);
 
-    //We also add in a EnergyHistogram that will sort the energy sampler AFTER burn-in
-    std::pair<std::vector<double>, std::vector<double>> //structuring the return of the energy_histogram
-    energy_histogram(int burnin_cycles , int n_samples , int bins );
+    // -----------------------------------------
+    // Getter functions for observables
+    // -----------------------------------------
 
-    // ---- Getter functions ----
-    double get_epsilon() const;
-    double get_abs_magnetization() const;
-    double get_Cv() const;
-    double get_susceptibility() const;
+    // Getter functions for instantaneous and mean energy per spin
+    const std::vector<double>& getEInst() const;
+    const std::vector<double>& getEMean() const;
+
+    // Getter function for the number of cycles
+    int getCycles() const;
+
+    // Energy per spin
+    double getEpsilon() const;
+
+    // Absolute magnetization per spin
+    double getAbsMagnetization() const;
+
+    // Specific heat per spin
+    double getCv() const;
+
+    // Magnetic susceptibility per spin
+    double getSusceptibility() const;
 
 };

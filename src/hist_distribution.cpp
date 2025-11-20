@@ -42,9 +42,9 @@ int main(){
     // We paired the bina and propb's inside the MonteCarlo class so that we can easily extract them as this:
     //We add in printout comments to know the simulations were successfull.
     std::cout << "Running model 1 histogram calculation" << std::endl;
-    auto [bins1 , prob1] = m1.energy_histogram(burnin1 , samples , bins); 
+    auto [bins1 , prob1] = m1.energyHistogram(burnin1 , samples , bins); 
     std::cout << "Rnning model 2 histogram calculation" << std::endl;
-    auto [bins2 , prob2] = m2.energy_histogram(burnin2 , samples , bins);
+    auto [bins2 , prob2] = m2.energyHistogram(burnin2 , samples , bins);
     std::cout << "Histograms sucessfully calculated" << std::endl;
 
     write_histogram_to_file("data_output/energy_hist_T1.txt", bins1, prob1); //we call upon our helper function to write out the file that we have defined.
