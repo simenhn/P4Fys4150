@@ -1,17 +1,49 @@
-# P4Fys4150
+# 2D Ising Model — Metropolis Monte Carlo (FYS4150 Project 4)
 
-make with g++ main.cpp MonteCarlo.cpp IsingModel.cpp Lattice.cpp -o ising_sim -O2
-run with ./ising_sim
+This project implements the two-dimensional Ising model using the Metropolis Monte Carlo algorithm in C++ (C++17).  
+It includes burn-in analysis, energy distributions, finite-size phase transition behaviour, and OpenMP parallelisation.  
+Python is used for plotting and post-processing.
+
+---
+
+## Features
+
+- Metropolis Monte Carlo sampling
+- Burn-in and equilibration analysis
+- Energy time-series and running mean measurements
+- Normalised histogram estimation of the energy distribution
+- Finite-size phase transition study
+- Parallel simulations using OpenMP
+- Python scripts for plotting and data analysis
+- Modular object-oriented C++ structure
 
 
-This project implements the **2D Ising model** using the **Metropolis Monte Carlo algorithm**, including:
+## Building and Running the Project
 
-- Burn-in and equilibration analysis  
-- Energy time-series sampling  
-- Probability density estimation via histograms  
-- Parallelisation with OpenMP  
-- Python scripts for plotting and analysis  
+### Build all executables
+make
 
+
+### Run the different simulations
+
+Validate the analytical 2×2 case:
+make run_validation
+
+Energy histogram simulation:
+make run_hist
+
+Burn-in and equilibration analysis:
+make run_spins
+
+
+Parallel OpenMP benchmark:
+make run_parallel
+
+
+Phase-transition scan:
+make run_phase
+
+---
 All physical and numerical components are implemented in **C++17** with a modular object-oriented structure.
 ## **macOS (Intel / Apple Silicon)**
 
@@ -31,29 +63,23 @@ $env:OMP_NUM_THREADS=4          # PowerShell
 export OMP_NUM_THREADS=N
 
 ### Project Structure
+P4Fys4150/
 │
-├── data_output/                  # Output files: energy sampling & histograms
+├── data_output/             # Output files from simulations 
+├── figs/                    # Generated plots used in the report
+├── include/                 # Header files (.hpp)
+├── scripts/                 # Python plotting/analysis scripts
 │
-├── figs/                         # Figures exported for the report (PDF, PNG)
+├── src/                     # C++ source code implementing model + tasks
+│   ├── Lattice.cpp
+│   ├── IsingModel.cpp
+│   ├── MonteCarlo.cpp
+│   ├── energy_histogram.cpp
+│   ├── phase_transitions.cpp
+│   ├── parallel_tests.cpp
+│   ├── burn_in.cpp
+│   └── validation_2x2.cpp
 │
-├── Lattice.cpp
-├── Lattice.hpp                   # Lattice class (periodic boundaries, spin ops)
-│
-├── IsingModel.cpp
-├── IsingModel.hpp                # Physics: E, delta_E, M, Boltzmann weights
-│
-├── MonteCarlo.cpp
-├── MonteCarlo.hpp                # Metropolis MCMC, burn-in, histogram routines
-│
-├── main.cpp                      # Basic simulation runner (Part a/b)
-│
-├── monte_carlo_vs_spins.cpp      # Burn-in & equilibration analysis
-├── monte_carlo_vs_spins_plot.py  # Python plotting script (instant + mean energy)
-│
-├── hist_distribution.cpp         # Energy histogram sampling 
-├── hist_distribution_plot.py     # Python plotting for histograms
-│
-├── paralell_tests.cpp            # Serial vs OpenMP parallel performance tests
-│
-├── .gitignore
-└── README.md                     # This file
+├── Makefile
+└── README.md
+
