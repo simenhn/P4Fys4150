@@ -26,6 +26,9 @@ public:
     // Main Monte Carlo loop
     void run();
 
+    // Monte Carlo loop with burn-in tracking (records energy at each cycle)
+    void run_burnin();
+
     // Measure observables
     void measure();
 

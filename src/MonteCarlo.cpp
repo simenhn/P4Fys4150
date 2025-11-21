@@ -7,7 +7,6 @@ MonteCarlo::MonteCarlo(IsingModel& model, int cycles)
     : model_(model), cycles_(cycles) {
     E_sum = E2_sum = Mabs_sum = M2_sum = 0.0;
 
-    // Prepare storage for Problem 5
     E_inst.resize(cycles); //the storage for the E_inst in that moment/lattice
     E_mean.resize(cycles); //storage for the mean of the lattices we have explored
 }
@@ -44,15 +43,48 @@ void MonteCarlo::run() {
             }
 
         }
-        double E = model_.getE(); //extracting the E
-        cumulative_E += E/N; 
-        E_inst[cycle] = E/N; 
-        E_mean[cycle] = (cumulative_E / (cycle + 1)) ; //have to divide cumulative with cycle +1 to avoid division by 0.
-        // Measure observables after each full sweep
         measure();
     }
 }
 
+// Monte Carlo loop with burn-in tracking
+// This is essentially the same as run() - it records E_inst and E_mean at each cycle
+void MonteCarlo::run_burnin() {
+    // Random number generators
+    std::mt19937_64 gen(std::random_device{}());
+    std::uniform_int_distribution<int> randSite(0, model_.getLatticeSize() - 1);
+    std::uniform_real_distribution<double> uniform(0.0, 1.0);
+
+    double cumulative_E = 0.0; // we initialize the cumulative E to be 0 in the start
+    int N = model_.getN(); // Total number of spins
+    
+    // Perform Monte Carlo cycles
+    for (int cycle = 0; cycle < cycles_; ++cycle) {
+        // Try flipping N random spins per cycle (one sweep)
+        for (int k = 0; k < N; ++k) {
+            int i = randSite(gen);
+            int j = randSite(gen);
+
+            double dE = model_.deltaE(i, j);
+
+            // Metropolis acceptance test
+            if (dE <= 0.0) {
+                model_.flipSpin(i, j, dE);
+            } else {
+                double r = uniform(gen);
+                if (r < model_.getBoltzmann(dE)) {
+                    model_.flipSpin(i, j, dE);
+                }
+            }
+        }
+        
+        // Record instantaneous and mean energy per spin at this cycle
+        double E = model_.getE();
+        cumulative_E += E/N; 
+        E_inst[cycle] = E/N; 
+        E_mean[cycle] = (cumulative_E / (cycle + 1));
+    }
+}
 
 //  Measure energy and magnetization (accumulate sums for averages)
 void MonteCarlo::measure() {
